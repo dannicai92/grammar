@@ -33,7 +33,6 @@
   h1 { font-size: 24px; font-weight: 700; margin-bottom: 4px; }
   .subtitle { font-size: 14px; color: var(--text2); margin-bottom: 16px; line-height: 1.4; }
   
-  /* 移动端优化的 API 区域 */
   .api-section {
     background: var(--blue-bg); border: 0.5px solid var(--blue);
     border-radius: var(--radius); padding: 14px; margin-bottom: 16px;
@@ -102,7 +101,6 @@
 
   .card-body { padding: 14px; }
   
-  /* 移动端大按钮 */
   .controls { display: flex; flex-direction: column; gap: 10px; margin-bottom: 12px; }
   .btn {
     display: flex; align-items: center; justify-content: center; gap: 8px;
@@ -125,7 +123,6 @@
   .error-msg { font-size: 14px; color: var(--red); margin-top: 8px; padding: 8px; background: var(--red-bg); border-radius: var(--radius-sm); }
   .hint { font-size: 14px; color: var(--text3); margin-bottom: 10px; line-height: 1.4; }
 
-  /* 转录框 - 移动端优化 */
   .transcript-box {
     padding: 14px; background: var(--bg2); 
     border-radius: var(--radius-sm); border: 0.5px solid var(--border);
@@ -135,7 +132,6 @@
   }
   .cursor { opacity: 0.4; animation: blink 1s ease-in-out infinite; }
   
-  /* 错误高亮 - 触摸友好 */
   .error-highlight {
     background: var(--red-bg); 
     border-bottom: 2px solid var(--red);
@@ -228,7 +224,6 @@
   .loading { display: inline-block; width: 18px; height: 18px; border: 2px solid rgba(255,255,255,0.3); border-top-color: white; border-radius: 50%; animation: spin 0.8s linear infinite; margin-left: 8px; vertical-align: middle; }
   @keyframes spin { to { transform: rotate(360deg); } }
   
-  /* 安装提示 */
   .install-prompt {
     position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%);
     background: var(--blue); color: white; padding: 12px 20px;
@@ -246,13 +241,13 @@
   <p class="subtitle">Mobile AI grammar analyzer. Add speakers, tap record, get instant feedback.</p>
   
   <div class="api-section">
-    <div class="api-label">🔑 Gemini API Key</div>
+    <div class="api-label">🔑 Kimi API Key</div>
     <div class="api-input-wrap">
-      <input type="password" class="api-input" id="apiKeyInput" placeholder="Paste your API key here" />
+      <input type="password" class="api-input" id="apiKeyInput" placeholder="Paste your Kimi API key" />
       <button class="api-btn" onclick="saveApiKey()">Save Key</button>
     </div>
     <div class="api-hint">
-      Get free key at <a href="https://aistudio.google.com/app/apikey" target="_blank">Google AI Studio</a> (50 requests/day). Key saves to your phone.
+      国内可直连。获取 Key： <a href="https://platform.moonshot.cn/" target="_blank">Moonshot 开放平台</a>。Key 仅保存在你的手机本地。
     </div>
   </div>
   
@@ -276,15 +271,16 @@ const CATEGORIES = {
   other:      { label:"Other",                  color:"#5F5E5A", bg:"#F1EFE8" },
 };
 
-const GEMINI_API_URL = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-lite:generateContent";
-let apiKey = localStorage.getItem('gemini_api_key') || '';
+// 替换为 Kimi 的 API 地址
+const AI_API_URL = "https://api.moonshot.cn/v1/chat/completions";
+let apiKey = localStorage.getItem('kimi_api_key') || '';
 if (apiKey) document.getElementById('apiKeyInput').value = apiKey;
 
 function saveApiKey() {
   const key = document.getElementById('apiKeyInput').value.trim();
   if (key) {
     apiKey = key;
-    localStorage.setItem('gemini_api_key', key);
+    localStorage.setItem('kimi_api_key', key);
     alert('✅ API Key saved!');
   }
 }
@@ -318,7 +314,6 @@ function updateAvatar(id) {
 }
 
 function startRecording(id) {
-  // 检查浏览器支持
   const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
   if (!SR) { 
     showError(id, "❌ Your browser doesn't support speech recognition. Use Chrome (Android) or Safari (iOS)."); 
@@ -366,7 +361,6 @@ function startRecording(id) {
 
   s.recognition = rec;
   
-  // 请求权限并启动
   try {
     rec.start();
     updateCardUI(id);
@@ -389,7 +383,7 @@ async function analyzeGrammar(id) {
   }
   
   if (!apiKey) {
-    showError(id, "Please enter your API Key first.");
+    showError(id, "Please enter your Kimi API Key first.");
     document.getElementById('apiKeyInput').focus();
     return;
   }
@@ -398,7 +392,7 @@ async function analyzeGrammar(id) {
   setAnalyzing(id, true);
 
   try {
-    const result = await callGeminiAPI(s.transcript, s.name);
+    const result = await callAIAPI(s.transcript);
     s.result = result;
     renderResult(id);
     renderSummary();
@@ -408,12 +402,10 @@ async function analyzeGrammar(id) {
   setAnalyzing(id, false);
 }
 
-async function callGeminiAPI(text, speakerName) {
-  const prompt = `You are a professional English grammar judge analyzing a speech transcript.
-
+// 针对 Kimi API 进行的调用
+async function callAIAPI(text) {
+  const systemPrompt = `You are a professional English grammar judge analyzing a speech transcript.
 Analyze this transcript and identify ALL grammatical errors. For each error, provide the exact text span as it appears in the original.
-
-Transcript: "${text}"
 
 Return a JSON object with this exact structure:
 {
@@ -430,45 +422,56 @@ Return a JSON object with this exact structure:
   ],
   "strengths": ["<strength 1>", "<strength 2>"],
   "suggestions": ["<suggestion 1>", "<suggestion 2>"]
-}`;
+}
+IMPORTANT: Return ONLY valid JSON, no markdown formatting.`;
 
   if (!apiKey || apiKey.trim() === '') {
-    throw new Error("❌ API Key is empty. Please paste your Gemini API key and click Save Key.");
+    throw new Error("❌ API Key is empty. Please paste your Kimi API key and click Save Key.");
   }
+
+  const payload = {
+    model: "moonshot-v1-8k", // 使用 Kimi 的基础 8K 模型，速度最快
+    messages: [
+      { role: "system", content: systemPrompt },
+      { role: "user", content: `Transcript: "${text}"` }
+    ],
+    response_format: { type: "json_object" }, // Kimi 支持 JSON mode
+    temperature: 0.1
+  };
 
   let response;
   try {
-    response = await fetch(`${GEMINI_API_URL}?key=${apiKey}`, {
+    response = await fetch(AI_API_URL, {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        contents: [{ parts: [{ text: prompt }] }],
-        generationConfig: { temperature: 0.1, responseMimeType: "application/json" }
-      })
+      headers: { 
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${apiKey}`
+      },
+      body: JSON.stringify(payload)
     });
   } catch (networkErr) {
-    throw new Error("❌ Network error — check your internet or try disabling VPN. (" + networkErr.message + ")");
+    throw new Error("网络错误，请检查网络连接 (" + networkErr.message + ")");
   }
 
   if (!response.ok) {
     let errorMsg = `HTTP ${response.status}`;
     try { const err = await response.json(); errorMsg = err.error?.message || errorMsg; } catch(_) {}
-    if (response.status === 400) throw new Error("❌ Bad request / invalid API Key. Please check your key at aistudio.google.com.");
-    if (response.status === 403) throw new Error("❌ API Key rejected (403). Please verify your key.");
-    if (response.status === 429) throw new Error("❌ Quota exceeded (429). Wait a minute and try again.");
-    throw new Error("❌ API Error: " + errorMsg);
+    if (response.status === 401) throw new Error("❌ API Key 错误，请检查你的 Key 是否复制完整。");
+    if (response.status === 402 || response.status === 403) throw new Error("❌ 账户余额不足或未实名认证，请前往 Moonshot 平台检查。");
+    if (response.status === 429) throw new Error("❌ API 请求并发过高，请稍后再试。");
+    throw new Error("❌ API 错误: " + errorMsg);
   }
 
   const data = await response.json();
-  const textResponse = data.candidates?.[0]?.content?.parts?.[0]?.text;
-  if (!textResponse) throw new Error("Empty response");
+  const textResponse = data.choices?.[0]?.message?.content;
+  if (!textResponse) throw new Error("返回结果为空");
   
   try {
     return JSON.parse(textResponse.replace(/```json|```/g, "").trim());
   } catch (e) {
     const jsonMatch = textResponse.match(/\{[\s\S]*\}/);
     if (jsonMatch) return JSON.parse(jsonMatch[0]);
-    throw new Error("Parse error");
+    throw new Error("JSON 解析错误，AI 未返回有效的 JSON 格式");
   }
 }
 
@@ -678,7 +681,6 @@ function renderAll() {
   renderSummary();
 }
 
-// PWA 安装提示
 let deferredPrompt;
 window.addEventListener('beforeinstallprompt', (e) => {
   e.preventDefault();
@@ -695,7 +697,6 @@ function installPWA() {
   }
 }
 
-// 检测浏览器并提示
 window.addEventListener('load', () => {
   const ua = navigator.userAgent;
   const isChrome = /Chrome/.test(ua) && /Google Inc/.test(navigator.vendor);
@@ -703,9 +704,9 @@ window.addEventListener('load', () => {
   const isiOS = /iPad|iPhone|iPod/.test(ua);
   
   if (isiOS && !isSafari) {
-    alert("⚠️ On iPhone, please use Safari browser for speech recognition. Chrome on iOS doesn't support this feature.");
+    alert("⚠️ 苹果手机请使用 Safari 浏览器以支持语音识别。");
   } else if (!isChrome && !isSafari) {
-    alert("⚠️ For best results, please use Chrome (Android) or Safari (iOS).");
+    alert("⚠️ 推荐使用 Chrome (安卓) 或 Safari (iOS) 以获得最佳体验。");
   }
 });
 
