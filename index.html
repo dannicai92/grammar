@@ -4,6 +4,8 @@
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
 <meta name="apple-mobile-web-app-capable" content="yes"/>
+<meta name="mobile-web-app-capable" content="yes"/>
+<meta name="theme-color" content="#1D9E75"/>
 <title>Speech Judge</title>
 <style>
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
@@ -17,113 +19,112 @@
     --red: #E24B4A; --red-bg: #FCEBEB; --red-dark: #A32D2D;
     --blue: #185FA5; --blue-bg: #E6F1FB;
   }
-  body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background: var(--bg3); color: var(--text); min-height: 100vh; padding: 16px; padding-bottom: 80px; -webkit-font-smoothing: antialiased; }
+  body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background: var(--bg3); color: var(--text); min-height: 100vh; padding: 16px; padding-bottom: 100px; -webkit-font-smoothing: antialiased; }
   .wrap { max-width: 100%; margin: 0 auto; }
-  h1 { font-size: 22px; font-weight: 700; margin-bottom: 3px; }
-  .subtitle { font-size: 13px; color: var(--text2); margin-bottom: 14px; line-height: 1.4; }
+  h1 { font-size: 24px; font-weight: 700; margin-bottom: 4px; }
+  .subtitle { font-size: 14px; color: var(--text2); margin-bottom: 16px; line-height: 1.4; }
 
   /* API Key */
-  .api-section { background: var(--green-bg); border: 0.5px solid var(--green); border-radius: var(--radius); padding: 12px; margin-bottom: 12px; }
-  .api-header { display: flex; align-items: center; justify-content: space-between; cursor: pointer; }
+  .api-section { background: var(--green-bg); border: 0.5px solid var(--green); border-radius: var(--radius); padding: 14px; margin-bottom: 12px; }
+  .api-header { display: flex; align-items: center; justify-content: space-between; cursor: pointer; user-select: none; }
   .api-title { font-size: 13px; font-weight: 700; color: var(--green-dark); }
   .api-status { font-size: 12px; color: var(--text3); }
   .api-status.ok { color: var(--green-dark); font-weight: 600; }
   .api-body { margin-top: 10px; display: flex; flex-direction: column; gap: 8px; }
   .api-body.hidden { display: none; }
-  .api-input { width: 100%; padding: 10px 12px; font-size: 15px; border: 0.5px solid var(--border2); border-radius: var(--radius-sm); font-family: monospace; background: var(--bg); -webkit-appearance: none; }
-  .api-save { width: 100%; padding: 11px; font-size: 15px; font-weight: 600; background: var(--green); color: white; border: none; border-radius: var(--radius-sm); cursor: pointer; }
-  .api-hint { font-size: 12px; color: var(--text2); margin-top: 4px; line-height: 1.4; }
+  .api-input { width: 100%; padding: 10px 12px; font-size: 16px; border: 0.5px solid var(--border2); border-radius: var(--radius-sm); font-family: monospace; background: var(--bg); -webkit-appearance: none; }
+  .api-save { width: 100%; padding: 12px; font-size: 15px; font-weight: 600; background: var(--green); color: white; border: none; border-radius: var(--radius-sm); cursor: pointer; -webkit-appearance: none; }
+  .api-save:active { opacity: 0.85; }
+  .api-hint { font-size: 12px; color: var(--text2); margin-top: 6px; line-height: 1.5; }
   .api-hint a { color: var(--green-dark); }
 
-  /* Tip banner */
-  .tip-banner { background: var(--amber-bg); border: 0.5px solid var(--amber); border-radius: var(--radius-sm); padding: 10px 12px; margin-bottom: 12px; font-size: 13px; color: var(--amber); line-height: 1.5; }
-  .tip-banner strong { font-weight: 700; }
+  /* Safari notice */
+  .notice { background: var(--blue-bg); border: 0.5px solid var(--blue); border-radius: var(--radius-sm); padding: 10px 14px; margin-bottom: 14px; font-size: 13px; color: var(--blue); line-height: 1.5; }
 
   /* Speaker card */
   .card { background: var(--bg); border: 0.5px solid var(--border); border-radius: var(--radius); margin-bottom: 12px; overflow: hidden; box-shadow: 0 1px 3px rgba(0,0,0,0.04); }
-  .card-head { display: flex; align-items: center; gap: 10px; padding: 12px 14px; border-bottom: 0.5px solid var(--border); background: var(--bg2); }
-  .avatar { width: 34px; height: 34px; border-radius: 50%; flex-shrink: 0; background: var(--green-bg); display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: 700; color: var(--green-dark); }
-  .name-input { flex: 1; font-size: 15px; font-weight: 600; border: none; background: transparent; outline: none; color: var(--text); font-family: inherit; }
-  .score-badge { width: 44px; height: 44px; border-radius: 50%; display: none; align-items: center; justify-content: center; font-size: 17px; font-weight: 700; flex-shrink: 0; border: 3px solid; }
-  .remove-btn { background: none; border: none; cursor: pointer; padding: 6px 8px; color: var(--text3); font-size: 22px; line-height: 1; flex-shrink: 0; }
+  .card.recording { border-color: var(--red); box-shadow: 0 0 0 3px rgba(226,75,74,0.1); }
+  .card-head { display: flex; align-items: center; gap: 12px; padding: 14px; border-bottom: 0.5px solid var(--border); background: var(--bg2); }
+  .card.recording .card-head { background: #fff5f5; }
+  .avatar { width: 36px; height: 36px; border-radius: 50%; flex-shrink: 0; background: var(--green-bg); display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: 700; color: var(--green-dark); }
+  .name-input { flex: 1; font-size: 16px; font-weight: 600; border: none; background: transparent; outline: none; color: var(--text); font-family: inherit; padding: 4px 0; }
+  .rec-indicator { display: none; align-items: center; gap: 6px; font-size: 13px; color: var(--red-dark); font-weight: 600; background: var(--red-bg); padding: 6px 10px; border-radius: 20px; }
+  .card.recording .rec-indicator { display: flex; }
+  .rec-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--red); animation: blink 1s ease-in-out infinite; }
+  .score-badge { width: 48px; height: 48px; border-radius: 50%; display: none; align-items: center; justify-content: center; font-size: 18px; font-weight: 700; flex-shrink: 0; border: 3px solid; }
+  .remove-btn { background: none; border: none; cursor: pointer; padding: 8px; color: var(--text3); font-size: 24px; line-height: 1; flex-shrink: 0; min-width: 44px; min-height: 44px; display: flex; align-items: center; justify-content: center; }
 
-  /* Card body */
-  .card-body { padding: 12px 14px; }
+  /* Buttons */
+  .card-body { padding: 14px; }
+  .controls { display: flex; flex-direction: column; gap: 10px; margin-bottom: 12px; }
+  .btn { display: flex; align-items: center; justify-content: center; gap: 8px; width: 100%; padding: 14px; font-size: 16px; font-weight: 600; cursor: pointer; border: 0.5px solid var(--border2); border-radius: var(--radius-sm); background: var(--bg); color: var(--text); font-family: inherit; -webkit-appearance: none; min-height: 48px; transition: all 0.15s; }
+  .btn:active { transform: scale(0.98); }
+  .btn:disabled { opacity: 0.5; cursor: not-allowed; }
+  .btn-dot { width: 10px; height: 10px; border-radius: 50%; background: var(--red); flex-shrink: 0; }
+  .btn-stop-shape { width: 10px; height: 10px; border-radius: 2px; background: var(--red); flex-shrink: 0; }
+  .btn-stop { border-color: var(--red); background: var(--red-bg); color: var(--red-dark); }
+  .btn-analyze { background: var(--green); color: white; border-color: var(--green); }
+  .btn-analyze:active { background: var(--green-dark); }
 
-  /* Transcript area */
-  .transcript-label { font-size: 11px; font-weight: 700; color: var(--text2); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 6px; display: flex; align-items: center; gap: 6px; }
-  .transcript-area {
-    width: 100%; min-height: 90px; max-height: 220px;
-    padding: 10px 12px; font-size: 15px; line-height: 1.8; color: var(--text);
-    background: var(--bg2); border: 0.5px solid var(--border);
-    border-radius: var(--radius-sm); font-family: inherit;
-    resize: vertical; -webkit-appearance: none; outline: none;
-    overflow-y: auto;
-  }
-  .transcript-area:focus { border-color: var(--green); }
-  .transcript-area.highlighted { background: var(--bg); white-space: pre-wrap; overflow-y: auto; cursor: default; }
+  .error-msg { font-size: 14px; color: var(--red); margin-top: 8px; padding: 10px; background: var(--red-bg); border-radius: var(--radius-sm); line-height: 1.5; }
+  .hint { font-size: 14px; color: var(--text3); margin-bottom: 10px; line-height: 1.4; }
+
+  /* Transcript */
+  .transcript-box { padding: 14px; background: var(--bg2); border-radius: var(--radius-sm); border: 0.5px solid var(--border); font-size: 15px; line-height: 1.9; color: var(--text); min-height: 80px; max-height: 260px; overflow-y: auto; margin-bottom: 14px; word-wrap: break-word; white-space: pre-wrap; }
+  .cursor { opacity: 0.4; animation: blink 1s ease-in-out infinite; }
   .hl-strength { background: #C6F0E0; border-bottom: 2px solid #1D9E75; padding: 1px 3px; border-radius: 3px; color: #0F6E56; font-weight: 700; }
   .hl-issue    { background: #FCEBEB; border-bottom: 2px solid #E24B4A; padding: 1px 3px; border-radius: 3px; color: #A32D2D; font-weight: 700; }
 
-  /* Buttons */
-  .btn-row { display: flex; gap: 8px; margin-top: 10px; }
-  .btn { display: flex; align-items: center; justify-content: center; gap: 6px; flex: 1; padding: 12px 8px; font-size: 14px; font-weight: 600; cursor: pointer; border: 0.5px solid var(--border2); border-radius: var(--radius-sm); background: var(--bg); color: var(--text); font-family: inherit; -webkit-appearance: none; min-height: 44px; transition: opacity 0.15s; }
-  .btn:active { opacity: 0.75; }
-  .btn:disabled { opacity: 0.45; cursor: not-allowed; }
-  .btn-dot { width: 9px; height: 9px; border-radius: 50%; background: var(--red); flex-shrink: 0; }
-  .btn-sq  { width: 9px; height: 9px; border-radius: 2px; background: var(--red); flex-shrink: 0; }
-  .btn-stop { border-color: var(--red); background: var(--red-bg); color: var(--red-dark); }
-  .btn-analyze { background: var(--green); color: white; border-color: var(--green); flex: 2; }
-  .btn-clear { color: var(--text3); font-size: 13px; flex: 0 0 auto; padding: 12px 10px; }
-
-  .error-msg { font-size: 13px; color: var(--red); margin-top: 8px; padding: 8px 10px; background: var(--red-bg); border-radius: var(--radius-sm); line-height: 1.4; }
-
   /* Result */
   .result { margin-top: 14px; }
-  .overall-comment { font-size: 14px; color: var(--text2); margin-bottom: 14px; line-height: 1.6; padding: 12px 14px; background: var(--bg2); border-radius: var(--radius-sm); border-left: 4px solid var(--green); }
-  .sec-header { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; margin: 14px 0 8px; display: flex; align-items: center; gap: 6px; }
-  .count-pill { font-size: 10px; font-weight: 700; padding: 2px 7px; border-radius: 20px; }
-  .strength-item { padding: 11px 12px; border-radius: var(--radius-sm); margin-bottom: 8px; background: var(--bg2); border: 0.5px solid var(--border); border-left: 4px solid var(--green); }
-  .s-tag { display: inline-block; font-size: 10px; font-weight: 700; padding: 2px 8px; border-radius: 20px; text-transform: uppercase; letter-spacing: 0.3px; margin-bottom: 6px; background: var(--green-bg); color: var(--green-dark); }
-  .s-quote { font-size: 15px; font-weight: 700; line-height: 1.4; margin-bottom: 6px; color: var(--green-dark); word-wrap: break-word; }
-  .s-quote::before { content: '\201C'; }
-  .s-quote::after  { content: '\201D'; }
-  .s-explain { font-size: 13px; color: var(--text2); line-height: 1.5; }
-  .s-tip { margin-top: 8px; font-size: 12px; color: var(--text2); font-style: italic; padding: 8px 10px; background: var(--bg); border-radius: 6px; border: 0.5px solid var(--border); line-height: 1.5; }
-  .s-tip::before { content: '💬 '; font-style: normal; }
-  .issue-item { padding: 11px 12px; border-radius: var(--radius-sm); margin-bottom: 8px; background: var(--bg2); border: 0.5px solid var(--border); border-left: 4px solid var(--red); }
-  .i-tag { display: inline-block; font-size: 10px; font-weight: 700; padding: 2px 8px; border-radius: 20px; text-transform: uppercase; letter-spacing: 0.3px; margin-bottom: 6px; background: var(--red-bg); color: var(--red-dark); }
-  .i-quote { font-size: 14px; font-weight: 700; color: var(--red-dark); text-decoration: line-through; text-decoration-color: rgba(226,75,74,0.5); margin-bottom: 5px; word-wrap: break-word; }
-  .i-fix { font-size: 13px; font-weight: 600; color: var(--green-dark); margin-bottom: 5px; }
-  .i-fix::before { content: '→ '; }
-  .i-explain { font-size: 13px; color: var(--text2); line-height: 1.5; }
-  .empty-sec { padding: 16px; text-align: center; color: var(--text3); font-size: 13px; border: 1.5px dashed var(--border); border-radius: var(--radius-sm); }
-  .comment-draft { margin-top: 14px; padding: 14px; background: #f0faf6; border-radius: var(--radius-sm); border: 0.5px solid var(--green); border-top: 3px solid var(--green); }
-  .cd-label { font-size: 11px; font-weight: 700; color: var(--green-dark); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 8px; }
-  .cd-text { font-size: 14px; color: var(--text); line-height: 1.8; white-space: pre-wrap; word-wrap: break-word; }
+  .overall-comment { font-size: 15px; color: var(--text2); margin-bottom: 16px; line-height: 1.6; padding: 14px; background: var(--bg2); border-radius: var(--radius-sm); border-left: 4px solid var(--green); }
+  .section-header { display: flex; align-items: center; gap: 8px; font-size: 13px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; margin: 16px 0 10px; }
+  .count-pill { font-size: 11px; font-weight: 700; padding: 2px 8px; border-radius: 20px; }
+  .strength-item { padding: 13px 14px; border-radius: var(--radius-sm); margin-bottom: 9px; background: var(--bg2); border: 0.5px solid var(--border); border-left: 4px solid var(--green); }
+  .strength-type { display: inline-block; font-size: 11px; font-weight: 700; padding: 3px 10px; border-radius: 20px; text-transform: uppercase; letter-spacing: 0.3px; margin-bottom: 8px; background: var(--green-bg); color: var(--green-dark); }
+  .strength-quote { font-size: 16px; font-weight: 700; line-height: 1.5; margin-bottom: 7px; word-wrap: break-word; color: var(--green-dark); }
+  .strength-quote::before { content: '\201C'; }
+  .strength-quote::after  { content: '\201D'; }
+  .strength-explain { font-size: 14px; color: var(--text2); line-height: 1.6; }
+  .strength-tip { margin-top: 9px; font-size: 13px; color: var(--text2); font-style: italic; padding: 9px 12px; background: var(--bg); border-radius: 8px; border: 0.5px solid var(--border); line-height: 1.6; }
+  .strength-tip::before { content: '💬 Comment: '; font-weight: 600; font-style: normal; }
+  .issue-item { padding: 13px 14px; border-radius: var(--radius-sm); margin-bottom: 9px; background: var(--bg2); border: 0.5px solid var(--border); border-left: 4px solid var(--red); }
+  .issue-type { display: inline-block; font-size: 11px; font-weight: 700; padding: 3px 10px; border-radius: 20px; text-transform: uppercase; letter-spacing: 0.3px; margin-bottom: 8px; background: var(--red-bg); color: var(--red-dark); }
+  .issue-quote { font-size: 15px; font-weight: 700; line-height: 1.5; margin-bottom: 7px; word-wrap: break-word; color: var(--red-dark); text-decoration: line-through; text-decoration-color: rgba(226,75,74,0.5); }
+  .issue-fix { font-size: 14px; font-weight: 600; color: var(--green-dark); margin-bottom: 7px; }
+  .issue-fix::before { content: '→ '; }
+  .issue-explain { font-size: 14px; color: var(--text2); line-height: 1.6; }
+  .empty-section { padding: 20px; text-align: center; color: var(--text3); font-size: 14px; border: 1.5px dashed var(--border); border-radius: var(--radius-sm); }
+  .comment-draft { margin-top: 16px; padding: 16px; background: #f0faf6; border-radius: var(--radius-sm); border: 0.5px solid var(--green); border-top: 3px solid var(--green); }
+  .comment-draft-label { font-size: 12px; font-weight: 700; color: var(--green-dark); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 10px; }
+  .comment-draft-text { font-size: 15px; color: var(--text); line-height: 1.9; white-space: pre-wrap; word-wrap: break-word; }
 
-  /* Add / summary */
-  .add-btn { width: 100%; padding: 14px; font-size: 15px; margin-top: 2px; border: 2px dashed var(--border2); border-radius: var(--radius); cursor: pointer; background: transparent; color: var(--text2); font-family: inherit; font-weight: 600; -webkit-appearance: none; }
+  .add-btn { width: 100%; padding: 16px; font-size: 16px; margin-top: 4px; border: 2px dashed var(--border2); border-radius: var(--radius); cursor: pointer; background: transparent; color: var(--text2); font-family: inherit; font-weight: 600; -webkit-appearance: none; }
   .add-btn:active { background: var(--bg2); }
-  .event-summary { background: var(--bg); border: 0.5px solid var(--border); border-radius: var(--radius); padding: 16px; margin-top: 20px; }
-  .es-label { font-size: 11px; font-weight: 700; color: var(--text2); text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 14px; }
-  .es-speaker { padding: 12px 0; border-bottom: 0.5px solid var(--border); }
-  .es-speaker:last-child { border-bottom: none; padding-bottom: 0; }
-  .es-name { font-size: 15px; font-weight: 700; margin-bottom: 6px; }
-  .es-row { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 5px; }
-  .es-pill { font-size: 11px; font-weight: 700; padding: 3px 9px; border-radius: 20px; }
-  .es-quote { font-size: 13px; color: var(--text2); line-height: 1.5; }
+  .event-summary { background: var(--bg); border: 0.5px solid var(--border); border-radius: var(--radius); padding: 20px; margin-top: 24px; }
+  .event-summary-label { font-size: 12px; font-weight: 700; color: var(--text2); text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 16px; }
+  .summary-speaker { padding: 14px 0; border-bottom: 0.5px solid var(--border); }
+  .summary-speaker:last-child { border-bottom: none; padding-bottom: 0; }
+  .summary-speaker-name { font-size: 16px; font-weight: 700; margin-bottom: 6px; }
+  .summary-row { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; margin-bottom: 6px; }
+  .summary-pill { font-size: 11px; font-weight: 700; padding: 3px 10px; border-radius: 20px; }
+  .summary-quote { font-size: 14px; color: var(--text2); line-height: 1.6; }
 
   @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0.3} }
-  .rec-dot-anim { width: 8px; height: 8px; border-radius: 50%; background: var(--red); animation: blink 1s ease-in-out infinite; display: inline-block; }
-  .loading { display: inline-block; width: 16px; height: 16px; border: 2px solid rgba(255,255,255,0.3); border-top-color: white; border-radius: 50%; animation: spin 0.8s linear infinite; margin-left: 6px; vertical-align: middle; }
+  .loading { display: inline-block; width: 18px; height: 18px; border: 2px solid rgba(255,255,255,0.3); border-top-color: white; border-radius: 50%; animation: spin 0.8s linear infinite; margin-left: 8px; vertical-align: middle; }
   @keyframes spin { to { transform: rotate(360deg); } }
+  .install-prompt { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); background: var(--green); color: white; padding: 12px 20px; border-radius: 30px; font-size: 14px; font-weight: 600; box-shadow: 0 4px 12px rgba(0,0,0,0.2); z-index: 1000; display: none; }
+  .install-prompt.show { display: block; }
 </style>
 </head>
 <body>
 <div class="wrap">
   <h1>Speech Judge</h1>
-  <p class="subtitle">Type or dictate each speaker's transcript → AI analysis → commentary ready.</p>
+  <p class="subtitle">Record each speaker → AI highlights strengths and flags issues → ready for your commentary.</p>
+
+  <div class="notice">
+    🍎 This version uses <strong>Apple Speech Recognition</strong> — open this file in <strong>Safari</strong> on iPhone/iPad for live transcription. Works in mainland China.
+  </div>
 
   <div class="api-section">
     <div class="api-header" onclick="toggleApi()">
@@ -137,18 +138,15 @@
     </div>
   </div>
 
-  <div class="tip-banner">
-    <strong>📝 How to enter transcript:</strong> Tap the text area below and type, or use your phone's <strong>voice keyboard</strong> (tap the mic 🎤 on your keyboard) to dictate directly — this works without any API.
-  </div>
-
   <div id="speakers"></div>
   <button class="add-btn" onclick="addSpeaker()">+ Add Speaker</button>
   <div id="eventSummary"></div>
 </div>
+<div class="install-prompt" id="installPrompt" onclick="installPWA()">📱 Install App</div>
 
 <script>
+/* ── API Key ── */
 let dsApiKey = '';
-
 function loadKey() {
   dsApiKey = localStorage.getItem('ds_apikey') || '';
   if (dsApiKey) document.getElementById('dsApiKey').value = dsApiKey;
@@ -164,21 +162,22 @@ function toggleApi() { document.getElementById('dsBody').classList.toggle('hidde
 function saveKey() {
   dsApiKey = document.getElementById('dsApiKey').value.trim();
   if (!dsApiKey) { alert('Please enter your DeepSeek API key.'); return; }
-  localStorage.setItem('ds_apikey', dsApiKey);
-  updateStatus(); alert('Saved!');
+  localStorage.setItem('ds_apikey', dsApiKey); updateStatus(); alert('Saved!');
 }
 
+/* ── Speaker state ── */
 let speakers = [], idCounter = 0;
 
 function addSpeaker() {
   const id = ++idCounter;
-  speakers.push({ id, name:'', transcript:'', result:null });
+  speakers.push({ id, name:'', transcript:'', result:null,
+    recState:'idle', recognition:null, finalText:'', userStopped:false });
   renderAll();
-  // Focus the new speaker's textarea after render
-  setTimeout(()=>{ const ta=document.getElementById(`ta-${id}`); if(ta) ta.focus(); }, 100);
 }
 function removeSpeaker(id) {
   if (speakers.length <= 1) return;
+  const s = speakers.find(x=>x.id===id);
+  if (s) { s.userStopped=true; s.recognition?.stop(); }
   speakers = speakers.filter(x=>x.id!==id);
   renderAll();
 }
@@ -187,45 +186,100 @@ function updateName(id, name) {
   s.name=name;
   const el=document.getElementById(`avatar-${id}`); if(el) el.textContent=(name||'S')[0].toUpperCase();
 }
-function updateTranscript(id, text) {
-  const s=speakers.find(x=>x.id===id); if(!s)return;
-  s.transcript=text;
-  // Show/hide analyse button
-  const btn=document.getElementById(`btn-analyze-${id}`);
-  if(btn) btn.style.display=text.trim()?'flex':'none';
-}
-function clearTranscript(id) {
-  const s=speakers.find(x=>x.id===id); if(!s)return;
-  s.transcript=''; s.result=null;
-  const ta=document.getElementById(`ta-${id}`);
-  if(ta){ta.style.display='block';ta.value='';}
-  const hl=document.getElementById(`hl-${id}`);
-  if(hl) hl.style.display='none';
-  const res=document.getElementById(`result-${id}`);
-  if(res) res.style.display='none';
-  const badge=document.getElementById(`score-badge-${id}`);
-  if(badge) badge.style.display='none';
-  const btn=document.getElementById(`btn-analyze-${id}`);
-  if(btn) btn.style.display='none';
+
+/* ── Web Speech API (Apple on iOS Safari) ── */
+function startRecording(id) {
+  const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+  if (!SR) {
+    showError(id, 'Speech recognition not supported. Please open this file in Safari on iPhone or iPad.');
+    return;
+  }
+  const s = speakers.find(x=>x.id===id); if(!s)return;
+
+  s.finalText = ''; s.transcript = ''; s.result = null;
+  s.recState = 'recording'; s.userStopped = false;
+
+  const rEl=document.getElementById(`result-${id}`); if(rEl) rEl.style.display='none';
+  const bEl=document.getElementById(`score-badge-${id}`); if(bEl) bEl.style.display='none';
   showError(id,'');
+
+  function createAndStart() {
+    if (s.userStopped) return;
+    const rec = new SR();
+    rec.lang = 'en-US';
+    rec.continuous = false;   // iOS Safari: always false, auto-restart on end
+    rec.interimResults = true;
+
+    rec.onresult = (e) => {
+      let interim = '';
+      for (let i = e.resultIndex; i < e.results.length; i++) {
+        const t = e.results[i][0].transcript;
+        if (e.results[i].isFinal) s.finalText += t + ' ';
+        else interim = t;
+      }
+      s.transcript = (s.finalText + interim).trim();
+      updateTranscriptDisplay(id);
+    };
+
+    rec.onerror = (e) => {
+      if (e.error === 'not-allowed' || e.error === 'service-not-allowed') {
+        s.userStopped = true; s.recState = 'idle';
+        showError(id, 'Microphone access denied. Please allow microphone in Safari settings.');
+        updateCardUI(id);
+      }
+      // no-speech and aborted are normal on iOS — onend will restart
+    };
+
+    rec.onend = () => {
+      if (s.userStopped) {
+        s.transcript = s.finalText.trim();
+        s.recState = 'done';
+        updateTranscriptDisplay(id);
+        updateCardUI(id);
+      } else {
+        // iOS auto-stops — restart immediately to keep recording
+        setTimeout(createAndStart, 80);
+      }
+    };
+
+    s.recognition = rec;
+    try { rec.start(); } catch(err) {
+      if (err.name === 'InvalidStateError') { setTimeout(createAndStart, 300); }
+      else {
+        s.recState = 'idle';
+        showError(id, 'Could not start recording: ' + err.message);
+        updateCardUI(id);
+      }
+    }
+  }
+
+  createAndStart();
+  updateCardUI(id);
 }
 
+function stopRecording(id) {
+  const s = speakers.find(x=>x.id===id); if(!s)return;
+  s.userStopped = true;
+  s.recognition?.stop();
+}
+
+/* ── DeepSeek Analysis ── */
 const DS_API = 'https://api.deepseek.com/v1/chat/completions';
 
 const SYSTEM_PROMPT = `You are an experienced speech competition judge. Analyze the transcript and return a JSON object with BOTH strengths and issues.
 
 STRENGTHS — find notable positives across these four areas:
-- word: precise, vivid, or well-chosen vocabulary
-- sentence: memorable lines, wit, humour, or quotes showing depth
-- structure: strong opening, signposting, transitions, call-backs
-- rhetoric: simile, anaphora, rhetorical question, contrast, tricolon — explain the effect
+- word: precise, vivid, or well-chosen vocabulary that elevates the expression
+- sentence: memorable lines, wit, humour, or quotes that show depth and preparation
+- structure: strong opening, clear signposting, smooth transitions, total-points-total framework, call-backs
+- rhetoric: effective use of simile, anaphora, rhetorical question, contrast, tricolon, etc.
 
 ISSUES — flag genuine problems:
-- incomplete: sentences that trail off or lack conclusion
-- mispronunciation: almost certainly mispronounced words
-- grammar: disagreement, wrong tense, missing article, wrong preposition
-- nonsequitur: statement that doesn't logically follow
-- malapropism: wrong word used for a similar-sounding word
+- incomplete: sentences that trail off or lack a main verb / conclusion
+- mispronunciation: words almost certainly mispronounced (infer from context)
+- grammar: subject-verb disagreement, wrong tense, missing article, wrong preposition
+- nonsequitur: statement that does not logically follow from what came before
+- malapropism: word used incorrectly in place of a similar-sounding word
 - other: any other clear language mistake
 
 Return ONLY valid JSON, no markdown:
@@ -234,85 +288,81 @@ Return ONLY valid JSON, no markdown:
   "overallComment": "<2-3 sentences, direct spoken-language tone>",
   "strengths": [{"type":"<word|sentence|structure|rhetoric>","quote":"<exact substring>","label":"<short tag>","explain":"<why it works>","tip":"<optional stage comment>"}],
   "issues": [{"type":"<incomplete|mispronunciation|grammar|nonsequitur|malapropism|other>","quote":"<exact substring>","fix":"<suggestion>","explain":"<brief explanation>"}],
-  "commentDraft":"<150-200 word spoken summary: overall impression, 2-3 strengths, 1-2 areas to improve, encouraging close>"
+  "commentDraft":"<150-200 word spoken summary: overall impression, 2-3 specific strengths, 1-2 areas to improve, encouraging close>"
 }
-quote must be exact substring of transcript. Return [] if nothing.`;
+quote must be exact substring of transcript. Return [] if nothing found.`;
 
 async function analyzeGrammar(id) {
-  const s=speakers.find(x=>x.id===id);
-  if(!s||!s.transcript.trim()){showError(id,'Please enter a transcript first.');return;}
-  if(!dsApiKey){showError(id,'Please configure your DeepSeek API key.');document.getElementById('dsBody').classList.remove('hidden');return;}
+  const s = speakers.find(x=>x.id===id);
+  if (!s||!s.transcript.trim()) { showError(id,'No transcript yet — please record first.'); return; }
+  if (!dsApiKey) { showError(id,'Please configure your DeepSeek API key.'); document.getElementById('dsBody').classList.remove('hidden'); return; }
   showError(id,'');
-  setAnalyzing(id,true,'Analysing speech…');
+
+  setAnalyzing(id, true, 'Cleaning transcript…');
   try {
-    const res=await fetch(DS_API,{
+    const cleaned = await cleanTranscript(s.transcript);
+    s.transcript = cleaned; updateTranscriptDisplay(id);
+  } catch(_){}
+
+  setAnalyzing(id, true, 'Analysing speech…');
+  try {
+    const res = await fetch(DS_API, {
       method:'POST',
       headers:{'Content-Type':'application/json','Authorization':`Bearer ${dsApiKey}`},
-      body:JSON.stringify({model:'deepseek-chat',
+      body:JSON.stringify({ model:'deepseek-chat',
         messages:[{role:'system',content:SYSTEM_PROMPT},{role:'user',content:`Speaker: ${s.name||'Speaker '+(speakers.indexOf(s)+1)}\n\nTranscript:\n${s.transcript}`}],
-        response_format:{type:'json_object'},temperature:0.3})
+        response_format:{type:'json_object'}, temperature:0.3 })
     }).catch(e=>{throw new Error('Network error: '+e.message);});
     if(!res.ok){
       let msg=`HTTP ${res.status}`;
       try{const e=await res.json();msg=e.error?.message||msg;}catch(_){}
-      throw new Error('DeepSeek error: '+msg);
+      throw new Error('API error: '+msg);
     }
     const raw=(await res.json()).choices?.[0]?.message?.content||'';
     let result;
     try{result=JSON.parse(raw.replace(/```json|```/g,'').trim());}
     catch(_){const m=raw.match(/\{[\s\S]*\}/);if(m)result=JSON.parse(m[0]);else throw new Error('Invalid response');}
-    s.result=result;
-    renderResult(id);
-    renderEventSummary();
-  } catch(e){showError(id,'Analysis failed: '+e.message);}
-  setAnalyzing(id,false);
+    s.result=result; renderResult(id); renderEventSummary();
+  } catch(e){ showError(id,'Analysis failed: '+e.message); }
+  setAnalyzing(id, false);
 }
 
-const STRENGTH_CFG={word:{label:'Word Choice',color:'#1D9E75',bg:'#E1F5EE'},sentence:{label:'Great Line',color:'#185FA5',bg:'#E6F1FB'},structure:{label:'Structure',color:'#854F0B',bg:'#FAEEDA'},rhetoric:{label:'Rhetoric',color:'#534AB7',bg:'#EEEDFE'}};
-const ISSUE_CFG={incomplete:{label:'Incomplete',color:'#A32D2D',bg:'#FCEBEB'},mispronunciation:{label:'Mispronunciation',color:'#854F0B',bg:'#FAEEDA'},grammar:{label:'Grammar',color:'#E24B4A',bg:'#FCEBEB'},nonsequitur:{label:'Non-sequitur',color:'#5F5E5A',bg:'#F1EFE8'},malapropism:{label:'Malapropism',color:'#534AB7',bg:'#EEEDFE'},other:{label:'Other',color:'#6b6a65',bg:'#f0efe9'}};
-
-function renderResult(id) {
-  const s=speakers.find(x=>x.id===id);
-  const el=document.getElementById(`result-${id}`);
-  if(!el||!s?.result)return;
-  const r=s.result;
-  const sc=r.overallScore>=8?'#1D9E75':r.overallScore>=6?'#BA7517':'#E24B4A';
-  const sb=r.overallScore>=8?'#E1F5EE':r.overallScore>=6?'#FAEEDA':'#FCEBEB';
-  const badge=document.getElementById(`score-badge-${id}`);
-  if(badge){badge.style.display='flex';badge.style.borderColor=sc;badge.style.background=sb;badge.style.color=sc;badge.textContent=r.overallScore;}
-
-  // Replace textarea with highlighted div
-  const ta=document.getElementById(`ta-${id}`);
-  let hl=document.getElementById(`hl-${id}`);
-  if(ta && hl) {
-    hl.innerHTML=highlightText(s.transcript, r);
-    ta.style.display='none';
-    hl.style.display='block';
-  }
-
-  const strHtml=(r.strengths||[]).length===0?'<div class="empty-sec">No standout strengths identified.</div>'
-    :(r.strengths||[]).map(item=>{const cfg=STRENGTH_CFG[item.type]||STRENGTH_CFG.word;
-      return`<div class="strength-item"><span class="s-tag" style="background:${cfg.bg};color:${cfg.color}">${escHtml(item.label||cfg.label)}</span>
-        <div class="s-quote">${escHtml(item.quote)}</div>
-        <div class="s-explain">${escHtml(item.explain)}</div>
-        ${item.tip?`<div class="s-tip">${escHtml(item.tip)}</div>`:''}</div>`;}).join('');
-
-  const issHtml=(r.issues||[]).length===0?'<div class="empty-sec">No notable issues found.</div>'
-    :(r.issues||[]).map(item=>{const cfg=ISSUE_CFG[item.type]||ISSUE_CFG.other;
-      return`<div class="issue-item"><span class="i-tag" style="background:${cfg.bg};color:${cfg.color}">${cfg.label}</span>
-        <div class="i-quote">${escHtml(item.quote)}</div>
-        ${item.fix?`<div class="i-fix">${escHtml(item.fix)}</div>`:''}
-        <div class="i-explain">${escHtml(item.explain)}</div></div>`;}).join('');
-
-  el.innerHTML=`<div class="overall-comment">${escHtml(r.overallComment)}</div>
-    <div class="sec-header" style="color:var(--green-dark)">Strengths <span class="count-pill" style="background:var(--green-bg);color:var(--green-dark)">${(r.strengths||[]).length}</span></div>${strHtml}
-    <div class="sec-header" style="color:var(--red-dark)">Areas for Improvement <span class="count-pill" style="background:var(--red-bg);color:var(--red-dark)">${(r.issues||[]).length}</span></div>${issHtml}
-    ${r.commentDraft?`<div class="comment-draft"><div class="cd-label">📝 Commentary Draft</div><div class="cd-text">${escHtml(r.commentDraft)}</div></div>`:''}`;
-  el.style.display='block';
-  document.getElementById(`btn-analyze-${id}`).style.display='none';
+async function cleanTranscript(raw) {
+  if (!dsApiKey||!raw.trim()) return raw;
+  try {
+    const res = await fetch(DS_API,{
+      method:'POST',
+      headers:{'Content-Type':'application/json','Authorization':`Bearer ${dsApiKey}`},
+      body:JSON.stringify({model:'deepseek-chat',max_tokens:2000,
+        messages:[{role:'user',content:`Lightly polish this English speech transcript:
+1. Each sentence on its own line
+2. Fix obvious homophone errors (their/there, to/too, etc.)
+3. Do NOT rephrase or change wording otherwise
+4. Return only the cleaned text\n\nTranscript:\n${raw}`}],
+        temperature:0.1})
+    });
+    if(!res.ok) return raw;
+    return (await res.json()).choices?.[0]?.message?.content?.trim()||raw;
+  } catch(_){ return raw; }
 }
 
-function highlightText(text, result) {
+/* ── UI helpers ── */
+const STRENGTH_CFG = {
+  word:     {label:'Word Choice',color:'#1D9E75',bg:'#E1F5EE'},
+  sentence: {label:'Great Line', color:'#185FA5',bg:'#E6F1FB'},
+  structure:{label:'Structure',  color:'#854F0B',bg:'#FAEEDA'},
+  rhetoric: {label:'Rhetoric',   color:'#534AB7',bg:'#EEEDFE'},
+};
+const ISSUE_CFG = {
+  incomplete:      {label:'Incomplete Sentence',color:'#A32D2D',bg:'#FCEBEB'},
+  mispronunciation:{label:'Mispronunciation',   color:'#854F0B',bg:'#FAEEDA'},
+  grammar:         {label:'Grammar',            color:'#E24B4A',bg:'#FCEBEB'},
+  nonsequitur:     {label:'Non-sequitur',       color:'#5F5E5A',bg:'#F1EFE8'},
+  malapropism:     {label:'Malapropism',        color:'#534AB7',bg:'#EEEDFE'},
+  other:           {label:'Other',              color:'#6b6a65',bg:'#f0efe9'},
+};
+
+function highlightTranscript(text, result) {
   const items=[];
   (result.strengths||[]).forEach(i=>{if(i.quote)items.push({quote:i.quote,cls:'hl-strength'});});
   (result.issues||[]).forEach(i=>{if(i.quote)items.push({quote:i.quote,cls:'hl-issue'});});
@@ -329,22 +379,87 @@ function highlightText(text, result) {
   return out;
 }
 
+function updateTranscriptDisplay(id) {
+  const s=speakers.find(x=>x.id===id);
+  const box=document.getElementById(`transcript-${id}`);
+  const hint=document.getElementById(`hint-${id}`);
+  if(!box||!s)return;
+  if(s.transcript){
+    box.style.display='block';
+    box.innerHTML=(s.result?highlightTranscript(s.transcript,s.result):escHtml(s.transcript))
+      +(s.recState==='recording'?'<span class="cursor"> |</span>':'');
+  } else box.style.display='none';
+  if(hint)hint.style.display=s.transcript?'none':'block';
+}
+
+function updateCardUI(id) {
+  const s=speakers.find(x=>x.id===id);
+  const card=document.getElementById(`card-${id}`);
+  if(!card||!s)return;
+  card.className='card'+(s.recState==='recording'?' recording':'');
+  const btnR=document.getElementById(`btn-record-${id}`);
+  const btnS=document.getElementById(`btn-stop-${id}`);
+  const btnA=document.getElementById(`btn-analyze-${id}`);
+  if(s.recState==='recording'){
+    btnR.style.display='none'; btnS.style.display='flex'; btnA.style.display='none';
+  } else {
+    btnR.style.display='flex';
+    btnR.innerHTML=`<span class="btn-dot"></span>${s.recState==='done'?'Re-record':'Start Recording'}`;
+    btnS.style.display='none';
+    btnA.style.display=(s.transcript&&s.recState!=='recording')?'flex':'none';
+  }
+  updateTranscriptDisplay(id);
+}
+
+function renderResult(id) {
+  const s=speakers.find(x=>x.id===id);
+  const el=document.getElementById(`result-${id}`);
+  if(!el||!s?.result)return;
+  const r=s.result;
+  const sc=r.overallScore>=8?'#1D9E75':r.overallScore>=6?'#BA7517':'#E24B4A';
+  const sb=r.overallScore>=8?'#E1F5EE':r.overallScore>=6?'#FAEEDA':'#FCEBEB';
+  const badge=document.getElementById(`score-badge-${id}`);
+  if(badge){badge.style.display='flex';badge.style.borderColor=sc;badge.style.background=sb;badge.style.color=sc;badge.textContent=r.overallScore;}
+
+  const strHtml=(r.strengths||[]).length===0?'<div class="empty-section">No standout strengths identified.</div>'
+    :(r.strengths||[]).map(item=>{const cfg=STRENGTH_CFG[item.type]||STRENGTH_CFG.word;
+      return`<div class="strength-item"><span class="strength-type" style="background:${cfg.bg};color:${cfg.color}">${escHtml(item.label||cfg.label)}</span>
+        <div class="strength-quote">${escHtml(item.quote)}</div>
+        <div class="strength-explain">${escHtml(item.explain)}</div>
+        ${item.tip?`<div class="strength-tip">${escHtml(item.tip)}</div>`:''}</div>`;}).join('');
+
+  const issHtml=(r.issues||[]).length===0?'<div class="empty-section">No notable issues found.</div>'
+    :(r.issues||[]).map(item=>{const cfg=ISSUE_CFG[item.type]||ISSUE_CFG.other;
+      return`<div class="issue-item"><span class="issue-type" style="background:${cfg.bg};color:${cfg.color}">${cfg.label}</span>
+        <div class="issue-quote">${escHtml(item.quote)}</div>
+        ${item.fix?`<div class="issue-fix">${escHtml(item.fix)}</div>`:''}
+        <div class="issue-explain">${escHtml(item.explain)}</div></div>`;}).join('');
+
+  el.innerHTML=`<div class="overall-comment">${escHtml(r.overallComment)}</div>
+    <div class="section-header" style="color:var(--green-dark)">Strengths <span class="count-pill" style="background:var(--green-bg);color:var(--green-dark)">${(r.strengths||[]).length}</span></div>${strHtml}
+    <div class="section-header" style="color:var(--red-dark)">Areas for Improvement <span class="count-pill" style="background:var(--red-bg);color:var(--red-dark)">${(r.issues||[]).length}</span></div>${issHtml}
+    ${r.commentDraft?`<div class="comment-draft"><div class="comment-draft-label">📝 Commentary Draft</div><div class="comment-draft-text">${escHtml(r.commentDraft)}</div></div>`:''}`;
+  el.style.display='block';
+  document.getElementById(`btn-analyze-${id}`).style.display='none';
+  updateTranscriptDisplay(id);
+}
+
 function renderEventSummary() {
   const analyzed=speakers.filter(s=>s.result);
   const el=document.getElementById('eventSummary');
   if(!el||!analyzed.length){if(el)el.innerHTML='';return;}
-  el.innerHTML=`<div class="event-summary"><div class="es-label">Event Summary — ${analyzed.length} speaker${analyzed.length>1?'s':''}</div>
+  el.innerHTML=`<div class="event-summary"><div class="event-summary-label">Event Summary — ${analyzed.length} speaker${analyzed.length>1?'s':''}</div>
     ${analyzed.map(s=>{const r=s.result;
       const sc=r.overallScore>=8?'#1D9E75':r.overallScore>=6?'#BA7517':'#E24B4A';
       const sb=r.overallScore>=8?'#E1F5EE':r.overallScore>=6?'#FAEEDA':'#FCEBEB';
       const top=(r.strengths||[]).slice(0,2).map(i=>`"${i.quote}"`).join(', ');
-      return`<div class="es-speaker"><div class="es-name">${escHtml(s.name||'Speaker')}</div>
-        <div class="es-row">
-          <span class="es-pill" style="background:${sb};color:${sc}">${r.overallScore}/10</span>
-          <span class="es-pill" style="background:var(--green-bg);color:var(--green-dark)">✦ ${(r.strengths||[]).length} strength${(r.strengths||[]).length!==1?'s':''}</span>
-          <span class="es-pill" style="background:var(--red-bg);color:var(--red-dark)">⚑ ${(r.issues||[]).length} issue${(r.issues||[]).length!==1?'s':''}</span>
+      return`<div class="summary-speaker"><div class="summary-speaker-name">${escHtml(s.name||'Speaker')}</div>
+        <div class="summary-row">
+          <span class="summary-pill" style="background:${sb};color:${sc}">${r.overallScore}/10</span>
+          <span class="summary-pill" style="background:var(--green-bg);color:var(--green-dark)">✦ ${(r.strengths||[]).length} strength${(r.strengths||[]).length!==1?'s':''}</span>
+          <span class="summary-pill" style="background:var(--red-bg);color:var(--red-dark)">⚑ ${(r.issues||[]).length} issue${(r.issues||[]).length!==1?'s':''}</span>
         </div>
-        ${top?`<div class="es-quote">Top: ${escHtml(top)}</div>`:''}</div>`;}).join('')}
+        ${top?`<div class="summary-quote">Top: ${escHtml(top)}</div>`:''}</div>`;}).join('')}
   </div>`;
 }
 
@@ -357,30 +472,48 @@ function escHtml(str){return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt
 
 function renderAll() {
   document.getElementById('speakers').innerHTML=speakers.map((s,i)=>`
-    <div class="card" id="card-${s.id}">
+    <div class="card${s.recState==='recording'?' recording':''}" id="card-${s.id}">
       <div class="card-head">
         <div class="avatar" id="avatar-${s.id}">${(s.name||'S')[0].toUpperCase()}</div>
         <input class="name-input" value="${escHtml(s.name)}" placeholder="Speaker ${i+1}" oninput="updateName(${s.id},this.value)"/>
+        <div class="rec-indicator"><span class="rec-dot"></span> REC</div>
         <div class="score-badge" id="score-badge-${s.id}"></div>
         <button class="remove-btn" onclick="removeSpeaker(${s.id})">×</button>
       </div>
       <div class="card-body">
-        <div class="transcript-label">Transcript <span style="font-size:10px;color:var(--text3);font-weight:400;text-transform:none">tap to type · use 🎤 on keyboard to dictate</span></div>
-        <textarea class="transcript-area" id="ta-${s.id}" placeholder="Tap here and type, or use your keyboard's voice input to dictate the speech…" oninput="updateTranscript(${s.id},this.value)">${escHtml(s.transcript)}</textarea>
-        <div class="transcript-area highlighted" id="hl-${s.id}" style="display:none"></div>
-        <div class="error-msg" id="error-${s.id}"></div>
-        <div class="btn-row">
-          <button class="btn btn-analyze" id="btn-analyze-${s.id}" onclick="analyzeGrammar(${s.id})" style="display:${s.transcript.trim()?'flex':'none'}">
+        <div class="controls">
+          <button class="btn" id="btn-record-${s.id}" onclick="startRecording(${s.id})">
+            <span class="btn-dot"></span>Start Recording
+          </button>
+          <button class="btn btn-stop" id="btn-stop-${s.id}" onclick="stopRecording(${s.id})" style="display:none">
+            <span class="btn-stop-shape"></span>Stop Recording
+          </button>
+          <button class="btn btn-analyze" id="btn-analyze-${s.id}" onclick="analyzeGrammar(${s.id})" style="display:none">
             Analyse Speech →
           </button>
-          <button class="btn btn-clear" onclick="clearTranscript(${s.id})" title="Clear">✕ Clear</button>
         </div>
+        <div class="error-msg" id="error-${s.id}"></div>
+        <div class="hint" id="hint-${s.id}">Tap "Start Recording" when the speaker begins.</div>
+        <div class="transcript-box" id="transcript-${s.id}" style="display:none"></div>
         <div class="result" id="result-${s.id}" style="display:none"></div>
       </div>
     </div>`).join('');
   speakers.forEach(s=>{if(s.result)renderResult(s.id);});
   renderEventSummary();
 }
+
+let deferredPrompt;
+window.addEventListener('beforeinstallprompt',e=>{e.preventDefault();deferredPrompt=e;document.getElementById('installPrompt').classList.add('show');});
+function installPWA(){if(deferredPrompt){deferredPrompt.prompt();deferredPrompt.userChoice.then(()=>document.getElementById('installPrompt').classList.remove('show'));}}
+
+window.addEventListener('load', () => {
+  const ua = navigator.userAgent;
+  const isIOS = /iPad|iPhone|iPod/.test(ua);
+  const isSafari = /Safari/.test(ua) && /Apple Computer/.test(navigator.vendor);
+  if (isIOS && !isSafari) {
+    alert('⚠️ Please open this file in Safari (not Chrome) on your iPhone/iPad for speech recognition to work.');
+  }
+});
 
 loadKey();
 addSpeaker();
